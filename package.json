@@ -5,7 +5,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsc",
-        "test": "jest",
+        "test:coverage": "jest --coverage --coverageReporters=lcov",
         "publish": "npm publish"
     },
     "files": [
@@ -14,6 +14,7 @@
     "devDependencies": {
         "@types/jest": "^29.5.14",
         "jest": "^29.7.0",
+        "jest-sonar-reporter": "^2.0.0",
         "ts-jest": "^29.2.5"
     }
 }

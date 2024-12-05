@@ -1,0 +1,83 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+  quality_check: # Corrigido para usar underline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests with Coverage
+        run: npm run test:coverage
+
+      - name: Upload Coverage to SonarCloud
+        uses: sonarsource/sonarcloud-github-action@v2
+        with:
+          projectKey: your-sonar-project-key
+          organization: your-sonar-organization
+          token: ${{ secrets.SONAR_TOKEN }}
+
+  publish:
+    needs: [build-and-test, quality_check]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify_discord:
+    needs: publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Notification to Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content": "📢 The calculator library has been published to npm!"}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
