@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "test": "jest",
-        "test:coverage": "jest --coverage --coverageReporters=lcov",
+        "test:coverage": "npx jest --coverage --coverageReporters=lcov",
         "publish": "npm publish"
     },
     "files": [
